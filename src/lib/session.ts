@@ -8,6 +8,7 @@ export interface SessionProfile {
   id: string;
   name: string;
   username: string;
+  pin_hash: string;
   institution_id: string | null;
   is_active: boolean;
 }
