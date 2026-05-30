@@ -12,7 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CreateShopRouteImport } from './routes/create-shop'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppStaffRouteImport } from './routes/_app.staff'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppSalesRouteImport } from './routes/_app.sales'
+import { Route as AppSaleRouteImport } from './routes/_app.sale'
+import { Route as AppJoinRequestsRouteImport } from './routes/_app.join-requests'
+import { Route as AppDrugsRouteImport } from './routes/_app.drugs'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppCustomersRouteImport } from './routes/_app.customers'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -29,10 +38,54 @@ const CreateShopRoute = CreateShopRouteImport.update({
   path: '/create-shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppStaffRoute = AppStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalesRoute = AppSalesRouteImport.update({
+  id: '/sales',
+  path: '/sales',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSaleRoute = AppSaleRouteImport.update({
+  id: '/sale',
+  path: '/sale',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppJoinRequestsRoute = AppJoinRequestsRouteImport.update({
+  id: '/join-requests',
+  path: '/join-requests',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDrugsRoute = AppDrugsRouteImport.update({
+  id: '/drugs',
+  path: '/drugs',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCustomersRoute = AppCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -40,30 +93,94 @@ export interface FileRoutesByFullPath {
   '/create-shop': typeof CreateShopRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/customers': typeof AppCustomersRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/drugs': typeof AppDrugsRoute
+  '/join-requests': typeof AppJoinRequestsRoute
+  '/sale': typeof AppSaleRoute
+  '/sales': typeof AppSalesRoute
+  '/settings': typeof AppSettingsRoute
+  '/staff': typeof AppStaffRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/create-shop': typeof CreateShopRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/customers': typeof AppCustomersRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/drugs': typeof AppDrugsRoute
+  '/join-requests': typeof AppJoinRequestsRoute
+  '/sale': typeof AppSaleRoute
+  '/sales': typeof AppSalesRoute
+  '/settings': typeof AppSettingsRoute
+  '/staff': typeof AppStaffRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/create-shop': typeof CreateShopRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/_app/customers': typeof AppCustomersRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/drugs': typeof AppDrugsRoute
+  '/_app/join-requests': typeof AppJoinRequestsRoute
+  '/_app/sale': typeof AppSaleRoute
+  '/_app/sales': typeof AppSalesRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/_app/staff': typeof AppStaffRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/create-shop' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | '/create-shop'
+    | '/login'
+    | '/register'
+    | '/customers'
+    | '/dashboard'
+    | '/drugs'
+    | '/join-requests'
+    | '/sale'
+    | '/sales'
+    | '/settings'
+    | '/staff'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/create-shop' | '/login' | '/register'
-  id: '__root__' | '/' | '/create-shop' | '/login' | '/register'
+  to:
+    | '/'
+    | '/create-shop'
+    | '/login'
+    | '/register'
+    | '/customers'
+    | '/dashboard'
+    | '/drugs'
+    | '/join-requests'
+    | '/sale'
+    | '/sales'
+    | '/settings'
+    | '/staff'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/create-shop'
+    | '/login'
+    | '/register'
+    | '/_app/customers'
+    | '/_app/dashboard'
+    | '/_app/drugs'
+    | '/_app/join-requests'
+    | '/_app/sale'
+    | '/_app/sales'
+    | '/_app/settings'
+    | '/_app/staff'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   CreateShopRoute: typeof CreateShopRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
@@ -92,6 +209,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CreateShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -99,11 +223,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/staff': {
+      id: '/_app/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof AppStaffRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sales': {
+      id: '/_app/sales'
+      path: '/sales'
+      fullPath: '/sales'
+      preLoaderRoute: typeof AppSalesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/sale': {
+      id: '/_app/sale'
+      path: '/sale'
+      fullPath: '/sale'
+      preLoaderRoute: typeof AppSaleRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/join-requests': {
+      id: '/_app/join-requests'
+      path: '/join-requests'
+      fullPath: '/join-requests'
+      preLoaderRoute: typeof AppJoinRequestsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/drugs': {
+      id: '/_app/drugs'
+      path: '/drugs'
+      fullPath: '/drugs'
+      preLoaderRoute: typeof AppDrugsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/customers': {
+      id: '/_app/customers'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof AppCustomersRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppCustomersRoute: typeof AppCustomersRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppDrugsRoute: typeof AppDrugsRoute
+  AppJoinRequestsRoute: typeof AppJoinRequestsRoute
+  AppSaleRoute: typeof AppSaleRoute
+  AppSalesRoute: typeof AppSalesRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppStaffRoute: typeof AppStaffRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCustomersRoute: AppCustomersRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppDrugsRoute: AppDrugsRoute,
+  AppJoinRequestsRoute: AppJoinRequestsRoute,
+  AppSaleRoute: AppSaleRoute,
+  AppSalesRoute: AppSalesRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppStaffRoute: AppStaffRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   CreateShopRoute: CreateShopRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
@@ -111,3 +316,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
