@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CreateShopRouteImport } from './routes/create-shop'
@@ -18,11 +19,18 @@ import { Route as AppStaffRouteImport } from './routes/_app.staff'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppSalesRouteImport } from './routes/_app.sales'
 import { Route as AppSaleRouteImport } from './routes/_app.sale'
+import { Route as AppNotificationsRouteImport } from './routes/_app.notifications'
 import { Route as AppJoinRequestsRouteImport } from './routes/_app.join-requests'
 import { Route as AppDrugsRouteImport } from './routes/_app.drugs'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppCustomersRouteImport } from './routes/_app.customers'
+import { Route as AppAuditRouteImport } from './routes/_app.audit'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -67,6 +75,11 @@ const AppSaleRoute = AppSaleRouteImport.update({
   path: '/sale',
   getParentRoute: () => AppRoute,
 } as any)
+const AppNotificationsRoute = AppNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppJoinRequestsRoute = AppJoinRequestsRouteImport.update({
   id: '/join-requests',
   path: '/join-requests',
@@ -87,16 +100,24 @@ const AppCustomersRoute = AppCustomersRouteImport.update({
   path: '/customers',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAuditRoute = AppAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/create-shop': typeof CreateShopRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/signup': typeof SignupRoute
+  '/audit': typeof AppAuditRoute
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
   '/drugs': typeof AppDrugsRoute
   '/join-requests': typeof AppJoinRequestsRoute
+  '/notifications': typeof AppNotificationsRoute
   '/sale': typeof AppSaleRoute
   '/sales': typeof AppSalesRoute
   '/settings': typeof AppSettingsRoute
@@ -107,10 +128,13 @@ export interface FileRoutesByTo {
   '/create-shop': typeof CreateShopRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/signup': typeof SignupRoute
+  '/audit': typeof AppAuditRoute
   '/customers': typeof AppCustomersRoute
   '/dashboard': typeof AppDashboardRoute
   '/drugs': typeof AppDrugsRoute
   '/join-requests': typeof AppJoinRequestsRoute
+  '/notifications': typeof AppNotificationsRoute
   '/sale': typeof AppSaleRoute
   '/sales': typeof AppSalesRoute
   '/settings': typeof AppSettingsRoute
@@ -123,10 +147,13 @@ export interface FileRoutesById {
   '/create-shop': typeof CreateShopRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/signup': typeof SignupRoute
+  '/_app/audit': typeof AppAuditRoute
   '/_app/customers': typeof AppCustomersRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/drugs': typeof AppDrugsRoute
   '/_app/join-requests': typeof AppJoinRequestsRoute
+  '/_app/notifications': typeof AppNotificationsRoute
   '/_app/sale': typeof AppSaleRoute
   '/_app/sales': typeof AppSalesRoute
   '/_app/settings': typeof AppSettingsRoute
@@ -139,10 +166,13 @@ export interface FileRouteTypes {
     | '/create-shop'
     | '/login'
     | '/register'
+    | '/signup'
+    | '/audit'
     | '/customers'
     | '/dashboard'
     | '/drugs'
     | '/join-requests'
+    | '/notifications'
     | '/sale'
     | '/sales'
     | '/settings'
@@ -153,10 +183,13 @@ export interface FileRouteTypes {
     | '/create-shop'
     | '/login'
     | '/register'
+    | '/signup'
+    | '/audit'
     | '/customers'
     | '/dashboard'
     | '/drugs'
     | '/join-requests'
+    | '/notifications'
     | '/sale'
     | '/sales'
     | '/settings'
@@ -168,10 +201,13 @@ export interface FileRouteTypes {
     | '/create-shop'
     | '/login'
     | '/register'
+    | '/signup'
+    | '/_app/audit'
     | '/_app/customers'
     | '/_app/dashboard'
     | '/_app/drugs'
     | '/_app/join-requests'
+    | '/_app/notifications'
     | '/_app/sale'
     | '/_app/sales'
     | '/_app/settings'
@@ -184,10 +220,18 @@ export interface RootRouteChildren {
   CreateShopRoute: typeof CreateShopRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -251,6 +295,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSaleRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/notifications': {
+      id: '/_app/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AppNotificationsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/join-requests': {
       id: '/_app/join-requests'
       path: '/join-requests'
@@ -279,14 +330,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCustomersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/audit': {
+      id: '/_app/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AppAuditRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAuditRoute: typeof AppAuditRoute
   AppCustomersRoute: typeof AppCustomersRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppDrugsRoute: typeof AppDrugsRoute
   AppJoinRequestsRoute: typeof AppJoinRequestsRoute
+  AppNotificationsRoute: typeof AppNotificationsRoute
   AppSaleRoute: typeof AppSaleRoute
   AppSalesRoute: typeof AppSalesRoute
   AppSettingsRoute: typeof AppSettingsRoute
@@ -294,10 +354,12 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAuditRoute: AppAuditRoute,
   AppCustomersRoute: AppCustomersRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppDrugsRoute: AppDrugsRoute,
   AppJoinRequestsRoute: AppJoinRequestsRoute,
+  AppNotificationsRoute: AppNotificationsRoute,
   AppSaleRoute: AppSaleRoute,
   AppSalesRoute: AppSalesRoute,
   AppSettingsRoute: AppSettingsRoute,
@@ -312,6 +374,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateShopRoute: CreateShopRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
