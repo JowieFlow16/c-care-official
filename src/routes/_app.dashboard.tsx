@@ -139,7 +139,7 @@ function RevenueChart({ sales, currency }: { sales: Array<{ sold_at: string; tot
           <XAxis dataKey="day" tickLine={false} axisLine={false} stroke="currentColor" opacity={0.5} fontSize={11} />
           <Tooltip
             contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
-            formatter={(v: number) => formatMoney(v, currency)}
+            formatter={(v) => formatMoney(Number(v ?? 0), currency)}
           />
           <Area dataKey="revenue" stroke="currentColor" strokeWidth={2} fill="url(#rev)" type="monotone" />
         </AreaChart>
