@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,11 @@ import { hashPin, slugify } from "@/lib/utils";
 import { refreshSession } from "@/lib/session";
 
 export const Route = createFileRoute("/create-shop")({
-  head: () => ({ meta: [{ title: "Create your shop — C-Care" }] }),
+  head: () => ({ meta: [{ title: "Set up your shop — C-Care" }] }),
+  beforeLoad: async () => {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) throw redirect({ to: "/signup" });
+  },
   component: CreateShop,
 });
 
@@ -16,7 +20,7 @@ function CreateShop() {
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
     shopName: "", address: "", phone: "", currency: "UGX",
-    adminName: "", adminUsername: "", email: "", password: "", pin: "",
+    adminName: "", adminUsername: "", pin: "",
   });
   const u = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm({ ...form, [k]: e.target.value });
@@ -24,20 +28,12 @@ function CreateShop() {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (form.pin.length < 4) return toast.error("PIN must be at least 4 digits");
-    if (form.password.length < 6) return toast.error("Password must be at least 6 characters");
     setBusy(true);
     try {
-      // 1. Sign up
-      const { data: signUp, error: e1 } = await supabase.auth.signUp({
-        email: form.email,
-        password: form.password,
-        options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-      });
-      if (e1) throw e1;
-      const userId = signUp.user?.id;
-      if (!userId) throw new Error("Signup failed");
+      const { data: u, error: eu } = await supabase.auth.getUser();
+      if (eu || !u.user) throw new Error("Not signed in");
+      const userId = u.user.id;
 
-      // 2. Create institution
       const { data: inst, error: e2 } = await supabase
         .from("institutions")
         .insert({
@@ -47,23 +43,17 @@ function CreateShop() {
           phone: form.phone || null,
           currency: form.currency,
         })
-        .select()
-        .single();
+        .select().single();
       if (e2) throw e2;
 
-      // 3. Create profile
       const pinHash = await hashPin(form.pin);
       const { error: e3 } = await supabase.from("profiles").insert({
-        id: userId,
-        institution_id: inst.id,
-        name: form.adminName,
-        username: form.adminUsername.toLowerCase(),
-        pin_hash: pinHash,
-        status: "active",
+        id: userId, institution_id: inst.id,
+        name: form.adminName, username: form.adminUsername.toLowerCase(),
+        pin_hash: pinHash, status: "active",
       });
       if (e3) throw e3;
 
-      // 4. Admin role
       const { error: e4 } = await supabase.from("user_roles").insert({
         user_id: userId, institution_id: inst.id, role: "admin",
       });
@@ -73,16 +63,13 @@ function CreateShop() {
       toast.success("Shop created!");
       nav({ to: "/dashboard" });
     } catch (err) {
-      const m = err instanceof Error ? err.message : String(err);
-      toast.error(m);
-    } finally {
-      setBusy(false);
-    }
+      toast.error(err instanceof Error ? err.message : String(err));
+    } finally { setBusy(false); }
   }
 
   return (
-    <AuthShell title="Create your shop" subtitle="Set up your drug shop and the first admin account."
-      footer={<>Already have a shop? <Link to="/login" className="text-foreground underline">Sign in</Link></>}>
+    <AuthShell title="Set up your shop" subtitle="Tell us about your drug shop. This only takes a minute."
+      footer={<>Wrong account? <Link to="/login" className="text-foreground underline">Sign in as someone else</Link></>}>
       <form onSubmit={submit} className="space-y-4">
         <div>
           <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Shop</div>
@@ -100,15 +87,11 @@ function CreateShop() {
           </div>
         </div>
         <div className="pt-2">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Admin account</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Admin profile</div>
           <div className="space-y-3">
             <div><label className={labelCls}>Your name</label><input className={inputCls} required value={form.adminName} onChange={u("adminName")} /></div>
-            <div><label className={labelCls}>Username (for staff login)</label><input className={inputCls} required value={form.adminUsername} onChange={u("adminUsername")} pattern="[a-zA-Z0-9_]+" /></div>
-            <div><label className={labelCls}>Email</label><input type="email" className={inputCls} required value={form.email} onChange={u("email")} /></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div><label className={labelCls}>Password</label><input type="password" minLength={6} className={inputCls} required value={form.password} onChange={u("password")} /></div>
-              <div><label className={labelCls}>PIN (4+ digits)</label><input type="password" inputMode="numeric" minLength={4} maxLength={8} className={inputCls} required value={form.pin} onChange={u("pin")} /></div>
-            </div>
+            <div><label className={labelCls}>Username</label><input className={inputCls} required value={form.adminUsername} onChange={u("adminUsername")} pattern="[a-zA-Z0-9_]+" /></div>
+            <div><label className={labelCls}>Transaction PIN (4+ digits)</label><input type="password" inputMode="numeric" minLength={4} maxLength={8} className={inputCls} required value={form.pin} onChange={u("pin")} /></div>
           </div>
         </div>
         <button disabled={busy} className={btnCls}>{busy ? "Creating…" : "Create shop"}</button>
