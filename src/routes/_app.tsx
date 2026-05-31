@@ -2,11 +2,12 @@ import { Outlet, createFileRoute, redirect, Link, useNavigate, useLocation } fro
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, Package, ShoppingCart, History, Users, UserPlus,
-  Settings, LogOut, Pill, Menu, X, Wifi, WifiOff,
+  Settings, LogOut, Pill, Menu, X, Wifi, WifiOff, Bell, ScrollText,
 } from "lucide-react";
 import { useSession } from "@/lib/session";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "@/components/theme-provider";
 
 export const Route = createFileRoute("/_app")({
   beforeLoad: async () => {
@@ -22,11 +23,13 @@ const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/sale", label: "New sale", icon: ShoppingCart },
   { to: "/sales", label: "Sales history", icon: History },
-  { to: "/drugs", label: "Inventory", icon: Package, adminOnly: false },
+  { to: "/drugs", label: "Inventory", icon: Package },
   { to: "/customers", label: "Customers", icon: Users, adminOnly: true },
   { to: "/staff", label: "Staff", icon: Users, adminOnly: true },
   { to: "/join-requests", label: "Join requests", icon: UserPlus, adminOnly: true },
-  { to: "/settings", label: "Settings", icon: Settings, adminOnly: true },
+  { to: "/notifications", label: "Notifications", icon: Bell },
+  { to: "/audit", label: "Audit logs", icon: ScrollText, adminOnly: true },
+  { to: "/settings", label: "Settings", icon: Settings },
 ];
 
 function AppShell() {
@@ -111,6 +114,7 @@ function AppShell() {
               online ? "bg-success/10 text-success" : "bg-warning/15 text-warning-foreground")}>
               {online ? <><Wifi className="h-3 w-3" /> Online</> : <><WifiOff className="h-3 w-3" /> Offline</>}
             </span>
+            <ThemeToggle compact />
           </div>
         </header>
         <main className="flex-1 p-4 lg:p-8">
