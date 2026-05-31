@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { useSession } from "@/lib/session";
 import { formatMoney } from "@/lib/utils";
 import { Package, ShoppingCart, TrendingUp, AlertTriangle } from "lucide-react";
-import { startOfDay } from "date-fns";
+import { startOfDay, subDays, format } from "date-fns";
+import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip } from "recharts";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — C-Care" }] }),
@@ -59,7 +60,12 @@ function Dashboard() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="rounded-xl border border-border bg-card p-5 lg:col-span-2">
-          <h2 className="mb-3 text-sm font-semibold">Recent sales</h2>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold">Revenue — last 7 days</h2>
+            <span className="text-xs text-muted-foreground">{currency}</span>
+          </div>
+          <RevenueChart sales={sales} currency={currency} />
+          <h2 className="mt-6 mb-3 text-sm font-semibold">Recent sales</h2>
           {sales.length === 0 ? (
             <div className="py-10 text-center text-sm text-muted-foreground">No sales yet. <Link to="/sale" className="underline">Make the first one →</Link></div>
           ) : (
@@ -107,6 +113,37 @@ function Kpi({ label, value, icon, tone = "ok" }: { label: string; value: string
         <span className={`grid h-7 w-7 place-items-center rounded-md ${tone==="warn"?"bg-warning/20 text-warning-foreground":"bg-accent"}`}>{icon}</span>
       </div>
       <div className="mt-2 text-2xl font-semibold tracking-tight">{value}</div>
+    </div>
+  );
+}
+
+function RevenueChart({ sales, currency }: { sales: Array<{ sold_at: string; total_price: number | string }>; currency: string }) {
+  const days = Array.from({ length: 7 }).map((_, i) => {
+    const d = startOfDay(subDays(new Date(), 6 - i));
+    return { day: format(d, "EEE"), ts: d.toISOString(), revenue: 0 };
+  });
+  for (const s of sales) {
+    const idx = days.findIndex((d, i) => s.sold_at >= d.ts && (i === 6 || s.sold_at < days[i + 1].ts));
+    if (idx >= 0) days[idx].revenue += Number(s.total_price);
+  }
+  return (
+    <div className="h-44 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={days} margin={{ left: 0, right: 0, top: 8, bottom: 0 }}>
+          <defs>
+            <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="currentColor" stopOpacity={0.35} />
+              <stop offset="100%" stopColor="currentColor" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis dataKey="day" tickLine={false} axisLine={false} stroke="currentColor" opacity={0.5} fontSize={11} />
+          <Tooltip
+            contentStyle={{ background: "var(--color-card)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
+            formatter={(v: number) => formatMoney(v, currency)}
+          />
+          <Area dataKey="revenue" stroke="currentColor" strokeWidth={2} fill="url(#rev)" type="monotone" />
+        </AreaChart>
+      </ResponsiveContainer>
     </div>
   );
 }
